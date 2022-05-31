@@ -1,0 +1,258 @@
+&ACCESS RVO
+&REL 4
+&PARAM DISKPATH = KRC:\R1\Program
+DEF Connect3_Game ( )
+
+;######### START USER DEFINED
+
+;Structures
+STRUC CUBE INT player, INT pos_x, INT pos_y, INT round
+
+;Matrixes
+DECL CUBE Field[4, 6]
+DECL FRAME Field_Pos[4, 6]
+DECL FRAME Player1[2, 6]
+DECL FRAME Player2[2, 6]
+
+;Variables
+ENUM GAME_MODE_TYPE HvH, HvR, RvR
+DECL GAME_MODE_TYPE GAME_MODE
+DECL BOOL GRAVITY, playing
+
+DECL INT i, j, gameround  ;Zählervariablen
+DECL INT ttt1, ttt2   ;Schere Stein Papier Auswahl
+
+DECL FRAME START_POS_P1, START_POS_P2
+DECL FRAME START_POS_FIELD ;Brauchen wir nicht, da Field_Pos komplett mit Koord gefüllt wird
+
+DECL REAL Player1X, Player1Y, Player1Z
+DECL REAL Player2X, Player2Y, Player2Z
+DECL REAL FX, FY, FZ
+
+DECL INT whoPlays
+
+
+
+DECL INT spalte, reihe  
+
+STRUC PPOS INT X, INT Y
+DECL PPOS pp [6] 
+;Messages
+
+
+
+;######### END USER DEFINED
+
+
+
+;######### POINTS
+;A1 = DECL E6POS XP12={X 197.537445,Y 1.61035585,Z -0.367093951,A -176.990829,B -88.1367340,C 176.297943,S 2,T 10,E1 0.0,E2 0.0,E3 0.0,E4 0.0,E5 0.0,E6 0.0}
+      ;DECL FDAT FP12={TOOL_NO 14,BASE_NO 6,IPO_FRAME #BASE,POINT2[] " ",TQ_STATE FALSE}
+      ;DECL PDAT PPDAT12={VEL 100.000,ACC 100.000,APO_DIST 100.000,GEAR_JERK 50.0000,EXAX_IGN 0}
+;A2 = E6POS XP13={X 197.526886,Y 48.1702194,Z -0.369385421,A -176.988235,B -88.1350555,C 176.295380,S 2,T 10,E1 0.0,E2 0.0,E3 0.0,E4 0.0,E5 0.0,E6 0.0}
+      ;DECL FDAT FP13={TOOL_NO 14,BASE_NO 6,IPO_FRAME #BASE,POINT2[] " ",TQ_STATE FALSE}
+      ;DECL PDAT PPDAT13={VEL 100.000,ACC 100.000,APO_DIST 100.000,GEAR_JERK 50.0000,EXAX_IGN 0}
+;B2 = E6POS XP14={X 166.116837,Y 47.5409813,Z -0.369275719,A -177.007111,B -88.1354,C 176.313919,S 2,T 10,E1 0.0,E2 0.0,E3 0.0,E4 0.0,E5 0.0,E6 0.0}
+      ;DECL FDAT FP14={TOOL_NO 14,BASE_NO 6,IPO_FRAME #BASE,POINT2[] " ",TQ_STATE FALSE}
+      ;DECL PDAT PPDAT14={VEL 100.000,ACC 100.000,APO_DIST 100.000,GEAR_JERK 50.0000,EXAX_IGN 0}
+
+;Spieler 1 Reihe 1 
+;Pl1[11] = DECL E6POS XP22={X 82.2353058,Y -41.7172813,Z 0.388017595,A -27.1446362,B -89.7355,C 117.001740,S 2,T 34,E1 0.0,E2 0.0,E3 0.0,E4 0.0,E5 0.0,E6 0.0}
+      ;DECL FDAT FP22={TOOL_NO 14,BASE_NO 6,IPO_FRAME #BASE,POINT2[] " ",TQ_STATE FALSE}
+      ;DECL PDAT PPDAT22={VEL 100.000,ACC 100.000,APO_DIST 100.000,GEAR_JERK 50.0000,EXAX_IGN 0}
+
+;Pl1[12] = DECL E6POS XP23={X 82.2353058,Y -10.4548798,Z 0.249777824,A -27.1446228,B -89.7355,C 117.001724,S 2,T 34,E1 0.0,E2 0.0,E3 0.0,E4 0.0,E5 0.0,E6 0.0}
+      ;DECL FDAT FP23={TOOL_NO 14,BASE_NO 6,IPO_FRAME #BASE,POINT2[] " ",TQ_STATE FALSE}
+      ;DECL PDAT PPDAT23={VEL 100.000,ACC 100.000,APO_DIST 100.000,GEAR_JERK 50.0000,EXAX_IGN 0}
+            
+;Pl1[22] = DECL E6POS XP24={X 35.3484612,Y -10.4584751,Z 0.239734381,A -27.2762051,B -89.7352524,C 117.133530,S 2,T 34,E1 0.0,E2 0.0,E3 0.0,E4 0.0,E5 0.0,E6 0.0}
+      ;DECL FDAT FP24={TOOL_NO 14,BASE_NO 6,IPO_FRAME #BASE,POINT2[] " ",TQ_STATE FALSE}
+      ;DECL PDAT PPDAT24={VEL 100.000,ACC 100.000,APO_DIST 100.000,GEAR_JERK 50.0000,EXAX_IGN 0}
+
+;Pl2[11] = DECL E6POS XP25={X 83.7938,Y 161.979172,Z -2.58887553,A -27.3082161,B -89.7352,C 117.165596,S 2,T 35,E1 0.0,E2 0.0,E3 0.0,E4 0.0,E5 0.0,E6 0.0}
+      ;DECL FDAT FP25={TOOL_NO 14,BASE_NO 6,IPO_FRAME #BASE,POINT2[] " ",TQ_STATE FALSE}
+      ;DECL PDAT PPDAT25={VEL 100.000,ACC 100.000,APO_DIST 100.000,GEAR_JERK 50.0000,EXAX_IGN 0}
+   
+
+
+
+;FOLD INI;%{PE}
+  ;FOLD BASISTECH INI
+    GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+    INTERRUPT ON 3 
+    BAS (#INITMOV,0 )
+  ;ENDFOLD (BASISTECH INI)
+  ;######### USER INIT
+  Player1X = 82.2353058
+  Player1Y = -41.7172813
+  Player1Z = 0.388017595
+  
+  Player2X = 83.7938
+  Player2Y = 161.979172
+  Player2Z = -2.58887553
+  
+  START_POS_P1 = XP1
+  START_POS_P2 = XP2
+  
+  FOR j = 0 TO 1 STEP 1
+       FOR i = 0 TO 5 STEP 1
+          $BASE = base_data[6]
+          $TOOL = tool_data[14]
+          
+          START_POS_P1.X = Player1X - j*46.8868446
+          START_POS_P1.Y = Player1Y + i*31.2624015
+          
+          START_POS_P2.X = Player2X - j*46.8868446
+          START_POS_P2.Y = Player2Y + i*31.2624015
+          
+          ;;DELETEME
+          ;START_POS_P1.Z = START_POS_P1.Z - 30
+          ;START_POS_P2.Z = START_POS_P2.Z - 30
+          ;
+          ;;SPTP START_POS_P1
+          ;
+          ;START_POS_P1.Z = START_POS_P1.Z + 30
+          ;
+          ;;SLIN START_POS_P1
+          
+          Player1[j, i] = START_POS_P1
+          Player2[j, i] = START_POS_P2
+          
+       ENDFOR
+    ENDFOR
+    
+    FX = 197.537445
+    FY = 1.61035585
+    FZ = -0.367093951
+    
+    START_POS_FIELD = XP3
+    ; FIELD
+    FOR j = 0 TO 3 STEP 1
+       FOR i = 0 TO 5 STEP 1
+          ; X = 31.410049
+          ; y = 46.55986355
+          
+          START_POS_FIELD.X = FX - j*31.410049
+          START_POS_FIELD.Y = FY + i*46.55986355
+          
+          Field_Pos[j, i] = START_POS_FIELD
+          
+       ENDFOR
+    ENDFOR
+    
+  ;INIT VARS
+   gameround = 0
+   playing = True
+   whoPlays = 1
+   
+   pp[1].x = 1 
+   pp[1].x = 1
+   
+   pp[2].x = 1
+   pp[2].x = 2
+   
+   pp[3].x = 1
+   pp[3].x = 3
+   
+   pp[4].x = 2
+   pp[4].x = 2
+   
+   pp[5].x = 2
+   pp[5].x = 1
+   
+   pp[6].x = 2
+   pp[6].x = 3  
+
+  ;ENDFOLD (USER INI)
+;ENDFOLD (INI)
+
+;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT
+$BWDSTART = FALSE
+PDAT_ACT=PDEFAULT
+FDAT_ACT=FHOME
+BAS (#PTP_PARAMS,100 )
+$H_POS=XHOME
+PTP  XHOME
+;ENDFOLD
+
+
+;###### START GAME CODE
+
+;-> Auswahl Gamemode und Gravity Modus
+
+;-> Schere, Stein, Papier wer beginnt
+;whoPlays = 1 || 2
+
+
+;FOR i = 0 TO 1 STEP 1
+;   FOR j = 0 TO 5 STEP 1
+;      START_POS_P1 = Player1[i, j]
+;      
+;      START_POS_P1.Z = START_POS_P1.Z - 30
+;      
+;      SPTP START_POS_P1
+;          
+;      START_POS_P1.Z = START_POS_P1.Z + 30
+;          
+;      SLIN START_POS_P1
+;   
+;   ENDFOR
+;ENDFOR
+
+
+WHILE playing and (gameround <= 24)
+   if gameround > 6 then   ; DEBUG DELETE ME 
+      playing = False
+   endif
+   
+;-> loop Runde 1 -> 12
+   whoPlays = C3_mod(gameround, 2) + 1
+
+   ;-> hole Stein von Spieler X
+   ;werSpielt = (gameround % 2) + 1
+   
+   ; Y POS
+   reihe = 1
+
+   ; X POS
+   IF gameround > 12 THEN
+      reihe = 2      
+      spalte = gameround - 12   
+   ENDIF
+      
+   spalte = spalte / 2
+   
+   IF whoPlays == 1 THEN   
+      C3_getcube(Player1[reihe, spalte])
+   ELSE
+      C3_getcube(Player2[reihe, spalte])
+   ENDIF
+   
+   
+   ;-> Auswahl auf Pad
+   ;pos_select = 
+   
+   ;-> Setze Stein
+   C3_placecube(Field_Pos[reihe, gameround])
+   
+   ;-> Prüfe Gewinn (Ja -> Anzeige und loop beenden, nein -> weiter)
+   
+ENDWHILE 
+;-> Setze Steine zurück
+
+
+
+
+     
+
+
+;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT
+$BWDSTART = FALSE
+PDAT_ACT=PDEFAULT
+FDAT_ACT=FHOME
+BAS (#PTP_PARAMS,100 )
+$H_POS=XHOME
+PTP  XHOME
+;ENDFOLD
+
+END

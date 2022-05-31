@@ -1,0 +1,14 @@
+&ACCESS RVO
+&PARAM EDITMASK = *
+DEFFCT INT C3_randomInt(Min:IN, Max:IN)
+   DECL INT Min
+   DECL INT Max
+   DECL INT Random
+   DECL STATE_T State
+   DECL MODUS_T Mode
+   
+   Random = 0
+   
+   CWrite($Fct_Call, State, Mode, "krl_getRandom", Random, Min, Max)
+   RETURN Random
+ENDFCT
