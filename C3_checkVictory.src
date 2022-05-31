@@ -1,0 +1,59 @@
+﻿&ACCESS RVP
+&PARAM EDITMASK = *
+DEFFCT BOOL C3_checkVictory(FIELD:IN)
+   DECL FRAME FIELD[4,6]
+   DECL BOOL STATUS
+   DECL INT reihe, spalte
+   
+   STATUS = FALSE
+   
+   
+   ; CHECK VERT
+   FOR spalte = 1 TO 6
+      FOR reihe = 1 TO 2
+         
+         if FIELD[reihe, spalte] then
+            if FIELD[reihe+1, spalte] then
+               if FIELD[reihe+2, spalte] then
+                  return True
+               ENDIF
+            ENDIF
+         endif
+      ENDFOR
+   ENDFOR
+   
+   ; CHECK HORI
+   FOR reihe = 1 TO 4
+      FOR spalte = 1 TO 4
+         
+         FIELD[reihe, spalte]
+         FIELD[reihe, spalte+1]
+         FIELD[reihe, spalte+2]
+         
+      ENDFOR
+   ENDFOR
+   
+   ; CHECK DIAG RIGHT
+   FOR spalte = 1 TO 4
+      FOR reihe = 1 TO 2
+         
+         FIELD[spalte, reihe]
+         FIELD[spalte+1, reihe+1]
+         FIELD[spalte+2, reihe+2]
+
+      ENDFOR
+   ENDFOR
+   
+   ; CHECK DIAG LEFT
+   FOR spalte = 3 TO 6
+      FOR reihe = 1 TO 2
+         
+         FIELD[spalte, reihe]
+         FIELD[spalte-1, reihe-1]
+         FIELD[spalte-2, reihe-2]
+
+      ENDFOR
+   ENDFOR
+   
+   RETURN STATUS
+ENDFCT

@@ -34,9 +34,6 @@ DECL INT whoPlays
 
 
 DECL INT spalte, reihe  
-
-STRUC PPOS INT X, INT Y
-DECL PPOS pp [6] 
 ;Messages
 
 
@@ -144,24 +141,6 @@ DECL PPOS pp [6]
    gameround = 0
    playing = True
    whoPlays = 1
-   
-   pp[1].x = 1 
-   pp[1].x = 1
-   
-   pp[2].x = 1
-   pp[2].x = 2
-   
-   pp[3].x = 1
-   pp[3].x = 3
-   
-   pp[4].x = 2
-   pp[4].x = 2
-   
-   pp[5].x = 2
-   pp[5].x = 1
-   
-   pp[6].x = 2
-   pp[6].x = 3  
 
   ;ENDFOLD (USER INI)
 ;ENDFOLD (INI)
@@ -234,6 +213,10 @@ WHILE playing and (gameround <= 24)
    
    ;-> Setze Stein
    C3_placecube(Field_Pos[reihe, gameround])
+   
+   ; Field[reihe, spalte] = Cube(whoPlays, reihe, spalte, gameround)
+   
+   ;C3_checkVictory()
    
    ;-> Prüfe Gewinn (Ja -> Anzeige und loop beenden, nein -> weiter)
    
