@@ -131,6 +131,18 @@ def poss_moves(Y, X):
 		if arr_field[Y-1][X+1] == empty and arr_field[Y-2][X+2] == empty:
 			if arr_field[Y][X+1] != empty and arr_field[Y-1][X+2] != empty:
 				moves.append( Move("3", [Y, X], [Y-1, X+1], [Y-2, X+2] ) )
+				
+	# check left strike cube in center r = 3
+	if X > xmin and Y < ymax-1:
+		if arr_field[Y-1][X-1] == empty and arr_field[Y+1][X+1] == empty:
+			if arr_field[Y][X-1] != empty:
+				moves.append( Move("3", [Y, X], [Y-1, X-1], [Y+1, X+1] ) )
+	
+	# check right strike in center	r = 3
+	if X < xmax and Y < ymax-1:
+		if arr_field[Y-1][X+1] == empty and arr_field[Y+1][X-1] == empty:
+			if arr_field[Y][X+1] != empty:
+				moves.append( Move("3", [Y, X], [Y-1, X+1], [Y+1, X-1] ) )
 	
 	
 def check_win(sign):
@@ -168,22 +180,29 @@ def check_win(sign):
 						
 	return False
 
-	
-print("\n" + "# "*20 + "\n")
-
-x = place_cube("A", random.randint(0, 5))
-poss_moves(x[0], x[1])
-pm()
-
-pp()
-print("\n")
-
-time.sleep(time2wait)
 
 
 while playing:
 	print(" ########### ROUND %d ########### " % gameround)
 	
+	p_A = place_cube("A", make_move("A"))
+	poss_moves(p_A[0], p_A[1])
+	
+	moves = shuffle()
+	
+	print("A placed @ ", p_A)
+	#pm()
+	pp()
+	print("\n")
+	
+	time.sleep(time2wait)
+	
+	if check_win("A"):
+		playing = False
+		continue
+		
+	time.sleep(time2wait)
+		
 	p_B = place_cube("B", int(input("An welcher X Stelle?\n> ")) )
 	print("B placed @ ", p_B)
 	pp()
@@ -192,25 +211,6 @@ while playing:
 	time.sleep(time2wait)
 	
 	if check_win("B"):
-		playing = False
-		continue
-	
-	time.sleep(time2wait)
-	
-	
-	p_A = place_cube("A", make_move("A"))
-	poss_moves(p_A[0], p_A[1])
-	
-	moves = shuffle()
-	
-	print("A placed @ ", p_A)
-	pm()
-	pp()
-	print("\n")
-	
-	time.sleep(time2wait)
-	
-	if check_win("A"):
 		playing = False
 		continue
 	
