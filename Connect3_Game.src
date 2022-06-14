@@ -15,9 +15,8 @@ DECL FRAME Player1[2, 6]
 DECL FRAME Player2[2, 6]
 
 ;Variables
-ENUM GAME_MODE_TYPE HvH, HvR, RvR
-DECL GAME_MODE_TYPE GAME_MODE
-DECL BOOL GRAVITY, playing
+DECL INT GAME_MODE, GRAVITY
+DECL BOOL playing
 
 DECL INT i, j, gameround  ;Zählervariablen
 DECL INT ttt1, ttt2   ;Schere Stein Papier Auswahl
@@ -158,9 +157,14 @@ PTP  XHOME
 ;###### START GAME CODE
 
 ;-> Auswahl Gamemode und Gravity Modus
+GAME_MODE = C3_IO(1)
+GRAVITY = C3_IO(2)
+
+
 
 ;-> Schere, Stein, Papier wer beginnt
-;whoPlays = 1 || 2
+whoPlays = C3_IO(3)
+
 
 
 ;FOR i = 0 TO 1 STEP 1

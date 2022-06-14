@@ -1,0 +1,16 @@
+&ACCESS RVP
+&PARAM EDITMASK = *
+DEFFCT BOOL T_IO( )
+   DECL INT r1, r2, r3, r4, r5
+   DECL INT i
+   
+   r1 = C3_IO(1)
+   r2 = C3_IO(2)
+   r3 = C3_IO(3)
+   r4 = C3_IO(4)
+   r5 = C3_IO(5)
+
+   i = r1 + r2
+   
+   RETURN TRUE
+ENDFCT

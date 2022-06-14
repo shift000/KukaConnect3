@@ -1,0 +1,85 @@
+&ACCESS RVO1
+ DEFFCT INT C3_IO(OPCODE:IN)
+   
+   DECL KrlMsg_T askForSomething
+   DECL KrlMsgDlgSK_T somethingSoftkey[7]
+   DECL KrlMsgPar_T somethingParameter[3]
+   DECL KrlMsgOpt_T somethingOption
+   DECL INT dialogHandle
+   DECL INT dialogValue
+   DECL BOOL dialogPresent
+   
+   DECL INT OPCODE
+   
+   SWITCH OPCODE
+      CASE 1   ; Auswahl Game Mode
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "H v H"}
+         somethingSoftkey[2] = {sk_type #value, sk_txt[] "H v R"}  
+         somethingSoftkey[3] = {sk_type #value, sk_txt[] "R v R"}
+         
+         askForSomething = {modul[] "GAMEMODE" , Nr 2000, msg_txt[] "Choose game mode"}
+
+      CASE 2   ; Auswahl Gravity Mode
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "Grav on"}
+         somethingSoftkey[2] = {sk_type #value, sk_txt[] "Grav off"}  
+         
+         askForSomething = {modul[] "GRAVITYMODE" , Nr 2001, msg_txt[] "Choose gravity mode"}
+      
+      CASE 3   ; Auswahl Starting Player
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "Player 1"}
+         somethingSoftkey[2] = {sk_type #value, sk_txt[] "Player 2"}  
+         
+         askForSomething = {modul[] "PLAYER" , Nr 2002, msg_txt[] "Choose starting player"}
+      
+      CASE 4   ; Auswahl Feld Spalte
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "1"}
+         somethingSoftkey[2] = {sk_type #value, sk_txt[] "2"}  
+         somethingSoftkey[3] = {sk_type #value, sk_txt[] "3"}
+         somethingSoftkey[4] = {sk_type #value, sk_txt[] "4"}
+         somethingSoftkey[5] = {sk_type #value, sk_txt[] "5"}
+         somethingSoftkey[6] = {sk_type #value, sk_txt[] "6"}
+         
+         askForSomething = {modul[] "COLUMN" , Nr 2003, msg_txt[] "Choose destinated column"}
+      
+      CASE 5   ; Auswahl Feld Reihe
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "A"}
+         somethingSoftkey[2] = {sk_type #value, sk_txt[] "B"}  
+         somethingSoftkey[3] = {sk_type #value, sk_txt[] "C"}
+         somethingSoftkey[4] = {sk_type #value, sk_txt[] "D"}
+         
+         askForSomething = {modul[] "ROW" , Nr 2004, msg_txt[] "Choose destinated row"}
+      
+      DEFAULT
+         ; ERROR
+   
+   ENDSWITCH
+      
+   ;;FOLD Softkeys
+   ;somethingSoftkey[1] = {sk_type #value, sk_txt[] "S 1"}
+   ;somethingSoftkey[2] = {sk_type #value, sk_txt[] "S 2"}  
+   ;somethingSoftkey[3] = {sk_type #value, sk_txt[] "S 3"}
+   ;somethingSoftkey[4] = {sk_type #value, sk_txt[] "S 4"}
+   ;;ENDFOLD
+ 
+   
+   
+   ;FOLD Parameter
+   somethingParameter[1] = {Par_Type #EMPTY}
+   somethingParameter[2] = {Par_Type #EMPTY}
+   somethingParameter[3] = {Par_Type #EMPTY}
+   ;ENDFOLD
+   
+   somethingOption = {VL_STOP FALSE, Clear_P_Reset TRUE, Clear_P_SAW FALSE, Log_to_DB TRUE}
+   
+   
+   dialogHandle = SET_KRLDLG(askForSomething, somethingParameter[ ], somethingSoftkey[ ], somethingOption)
+   dialogValue = 0
+   dialogPresent = TRUE      
+   WHILE dialogPresent == TRUE
+   
+       dialogPresent = EXISTS_KRLDLG(dialogHandle, dialogValue)
+   
+   ENDWHILE
+
+   RETURN  (dialogValue)
+ENDFCT
