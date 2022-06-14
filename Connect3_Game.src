@@ -19,20 +19,16 @@ DECL INT GAME_MODE, GRAVITY
 DECL BOOL playing
 
 DECL INT i, j, gameround  ;Zählervariablen
-DECL INT ttt1, ttt2   ;Schere Stein Papier Auswahl
 
-DECL FRAME START_POS_P1, START_POS_P2
-DECL FRAME START_POS_FIELD ;Brauchen wir nicht, da Field_Pos komplett mit Koord gefüllt wird
+DECL FRAME START_POS_P1, START_POS_P2  ; ABLAGE Player 1, Player 2
+DECL FRAME START_POS_FIELD             ; Spielfeld
 
 DECL REAL Player1X, Player1Y, Player1Z
 DECL REAL Player2X, Player2Y, Player2Z
 DECL REAL FX, FY, FZ
 
-DECL INT whoPlays
-
-
-
-DECL INT spalte, reihe  
+DECL INT whoPlays, whoWon
+  
 ;Messages
 
 
@@ -101,16 +97,6 @@ DECL INT spalte, reihe
           START_POS_P2.X = Player2X - j*46.8868446
           START_POS_P2.Y = Player2Y + i*31.2624015
           
-          ;;DELETEME
-          ;START_POS_P1.Z = START_POS_P1.Z - 30
-          ;START_POS_P2.Z = START_POS_P2.Z - 30
-          ;
-          ;;SPTP START_POS_P1
-          ;
-          ;START_POS_P1.Z = START_POS_P1.Z + 30
-          ;
-          ;;SLIN START_POS_P1
-          
           Player1[j, i] = START_POS_P1
           Player2[j, i] = START_POS_P2
           
@@ -135,11 +121,6 @@ DECL INT spalte, reihe
           
        ENDFOR
     ENDFOR
-    
-  ;INIT VARS
-   gameround = 0
-   playing = True
-   whoPlays = 1
 
   ;ENDFOLD (USER INI)
 ;ENDFOLD (INI)
@@ -160,77 +141,21 @@ PTP  XHOME
 GAME_MODE = C3_IO(1)
 GRAVITY = C3_IO(2)
 
-
-
 ;-> Schere, Stein, Papier wer beginnt
 whoPlays = C3_IO(3)
 
 
+SWITCH GAME_MODE
+   case 1
+      whoWon = C3_HvH(GRAVITY, whoPlays, START_POS_FIELD, START_POS_P1, START_POS_P2)   
+   case 2
+      ;whoWon = C3_HvR(GRAVITY, whoPlays, START_POS_FIELD, START_POS_P1, START_POS_P2)
+   case 3
+      ;whoWon = C3_RvR(GRAVITY, whoPlays, START_POS_FIELD, START_POS_P1, START_POS_P2)
+ENDSWITCH
 
-;FOR i = 0 TO 1 STEP 1
-;   FOR j = 0 TO 5 STEP 1
-;      START_POS_P1 = Player1[i, j]
-;      
-;      START_POS_P1.Z = START_POS_P1.Z - 30
-;      
-;      SPTP START_POS_P1
-;          
-;      START_POS_P1.Z = START_POS_P1.Z + 30
-;          
-;      SLIN START_POS_P1
-;   
-;   ENDFOR
-;ENDFOR
+; AUSGABE "PLAYER %d WON !! "
 
-
-WHILE playing and (gameround <= 24)
-   if gameround > 6 then   ; DEBUG DELETE ME 
-      playing = False
-   endif
-   
-;-> loop Runde 1 -> 12
-   whoPlays = C3_mod(gameround, 2) + 1
-
-   ;-> hole Stein von Spieler X
-   ;werSpielt = (gameround % 2) + 1
-   
-   ; Y POS
-   reihe = 1
-
-   ; X POS
-   IF gameround > 12 THEN
-      reihe = 2      
-      spalte = gameround - 12   
-   ENDIF
-      
-   spalte = spalte / 2
-   
-   IF whoPlays == 1 THEN   
-      C3_getcube(Player1[reihe, spalte])
-   ELSE
-      C3_getcube(Player2[reihe, spalte])
-   ENDIF
-   
-   
-   ;-> Auswahl auf Pad
-   ;pos_select = 
-   
-   ;-> Setze Stein
-   C3_placecube(Field_Pos[reihe, gameround])
-   
-   ; Field[reihe, spalte] = Cube(whoPlays, reihe, spalte, gameround)
-   
-   ;C3_checkVictory()
-   
-   ;-> Prüfe Gewinn (Ja -> Anzeige und loop beenden, nein -> weiter)
-   
-ENDWHILE 
-;-> Setze Steine zurück
-
-
-
-
-     
 
 
 ;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT

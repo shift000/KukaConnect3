@@ -1,0 +1,70 @@
+﻿&ACCESS RVP
+&PARAM EDITMASK = *
+DEFFCT INT C3_HvH(GR:IN, WP:IN, FG:IN, FP1:IN, FP2:IN)
+   ; GR [GRAVITY], WP [WHO PLAYS], FG [FIELD GAME]
+   ; FP1 [FIELD PLAYER 1], FP2 [FIELD PLAYER 2] 
+   
+   ; ### DECLARATION ###
+   DECL INT GR, WP
+   DECL FRAME FG[4, 6]
+   DECL FRAME FP1[2, 6], FP2[2, 6]
+   
+   DECL BOOL playing
+   DECL INT gameround
+   DECL INT row, col
+   
+   DECL INT sel_row, sel_col
+   
+   ; ### INIT ###
+   playing = TRUE
+   gameround = 1
+   
+   
+   ; ### GAMELOOP ###
+   
+   WHILE playing and (gameround <= 24)
+      
+      ;-> hole Stein von Spieler WP
+      ; Y POS
+      row = 1
+
+      ; X POS
+      IF gameround > 12 THEN
+         row = 2      
+         col = gameround - 12   
+      ENDIF
+      
+      col = col / 2
+   
+      IF WP == 1 THEN   
+         C3_getcube(FP1[row, col])
+      ELSE
+         C3_getcube(FP2[row, col])
+      ENDIF
+   
+   
+      ;-> Auswahl auf Pad
+      ; Test Gravity = off
+      sel_col = C3_IO(4)
+      sel_row = C3_IO(5)      
+   
+      ;-> Setze Stein
+      C3_placecube(FG[sel_row, sel_col])
+   
+      ; Field[reihe, spalte] = Cube(whoPlays, reihe, spalte, gameround) - TODO
+   
+      ;C3_checkVictory()
+   
+      ;-> Prüfe Gewinn (Ja -> Anzeige und loop beenden, nein -> weiter)
+   
+      ; Player wechseln
+      IF WP == 1 THEN
+         WP = 2
+      ELSE
+         WP = 1
+      ENDIF
+   ENDWHILE 
+   ;-> Setze Steine zurück
+   
+   RETURN 1
+ENDFCT
