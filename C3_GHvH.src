@@ -1,0 +1,156 @@
+&ACCESS RV
+DEF  C3_GHvH (GR:IN, WP:IN)
+   ; GR [GRAVITY], WP [WHO PLAYS], FG [FIELD GAME]
+   ; FP1 [FIELD PLAYER 1], FP2 [FIELD PLAYER 2] 
+   
+   ; ### DECLARATION ###
+   DECL INT GR, WP
+   DECL FRAME FG[4, 6]
+   DECL FRAME FPL1[2, 6], FPL2[2, 6]
+   
+   DECL BOOL playing
+   DECL INT gameround
+   DECL INT row, col
+   
+   DECL INT sel_row, sel_col
+   
+   DECL REAL Player1X, Player1Y, Player1Z
+   DECL REAL Player2X, Player2Y, Player2Z
+   DECL REAL FX, FY, FZ
+   
+   DECL FRAME START_POS_P1, START_POS_P2  ; ABLAGE Player 1, Player 2
+   DECL FRAME START_POS_FIELD             ; Spielfeld
+   
+   DECL INT j, i
+   
+   ;FOLD INI;%{PE}
+      ;FOLD BASISTECH INI
+         GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+         INTERRUPT ON 3 
+         BAS (#INITMOV,0 )
+      ;ENDFOLD (BASISTECH INI)
+      ;FOLD USER INI
+         ;Make your modifications here
+         
+      ;ENDFOLD (USER INI)
+   ;ENDFOLD (INI)
+   
+   ;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT
+      $BWDSTART = FALSE
+      PDAT_ACT=PDEFAULT
+      FDAT_ACT=FHOME
+      BAS (#PTP_PARAMS,100 )
+      $H_POS=XHOME
+      PTP  XHOME
+   ;ENDFOLD
+   
+   
+   ; ### INIT ###
+   playing = TRUE
+   gameround = 1
+   
+   
+   ; ### FIELD FILLING ###
+   Player1X = 82.2353058
+   Player1Y = -41.7172813
+   Player1Z = 0.388017595
+  
+   Player2X = 83.7938
+   Player2Y = 161.979172
+   Player2Z = -2.58887553
+  
+   START_POS_P1 = XP1
+   START_POS_P2 = XP2
+  
+   FOR j = 0 TO 1 STEP 1
+       FOR i = 0 TO 5 STEP 1
+          $BASE = base_data[6]
+          $TOOL = tool_data[14]
+          
+          START_POS_P1.X = Player1X - j*46.8868446
+          START_POS_P1.Y = Player1Y + i*31.2624015
+          
+          START_POS_P2.X = Player2X - j*46.8868446
+          START_POS_P2.Y = Player2Y + i*31.2624015
+          
+          FPL1[j, i] = START_POS_P1
+          FPL2[j, i] = START_POS_P2
+          
+       ENDFOR
+    ENDFOR
+    
+    FX = 197.537445
+    FY = 1.61035585
+    FZ = -0.367093951
+    
+    START_POS_FIELD = XP3
+    ; FIELD
+    FOR j = 0 TO 3 STEP 1
+       FOR i = 0 TO 5 STEP 1
+          ; X = 31.410049
+          ; y = 46.55986355
+          
+          START_POS_FIELD.X = FX - j*31.410049
+          START_POS_FIELD.Y = FY + i*46.55986355
+          
+          FG[j, i] = START_POS_FIELD
+          
+       ENDFOR
+    ENDFOR
+   
+   
+   ; ### GAMELOOP ###
+   
+   WHILE playing and (gameround <= 24)
+      
+      ;-> hole Stein von Spieler WP
+      ; Y POS
+      row = 1
+
+      ; X POS
+      IF gameround > 12 THEN
+         row = 2      
+         col = gameround - 12   
+      ENDIF
+      
+      col = col / 2
+   
+      IF WP == 1 THEN   
+         C3_getcube(FPL1[row, col])
+      ELSE
+         C3_getcube(FPL2[row, col])
+      ENDIF
+   
+   
+      ;-> Auswahl auf Pad
+      ; Test Gravity = off
+      sel_col = C3_IO(4)
+      sel_row = C3_IO(5)      
+   
+      ;-> Setze Stein
+      C3_placecube(FG[sel_row, sel_col])
+   
+      ; Field[reihe, spalte] = Cube(whoPlays, reihe, spalte, gameround) - TODO
+   
+      ;C3_checkVictory()
+   
+      ;-> Prüfe Gewinn (Ja -> Anzeige und loop beenden, nein -> weiter)
+   
+      ; Player wechseln
+      IF WP == 1 THEN
+         WP = 2
+      ELSE
+         WP = 1
+      ENDIF
+   ENDWHILE 
+   ;-> Setze Steine zurück
+   
+   ;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT
+      $BWDSTART = FALSE
+      PDAT_ACT=PDEFAULT
+      FDAT_ACT=FHOME
+      BAS (#PTP_PARAMS,100 )
+      $H_POS=XHOME
+      PTP  XHOME
+   ;ENDFOLD
+END
