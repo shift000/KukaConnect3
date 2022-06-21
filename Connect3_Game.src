@@ -1,4 +1,4 @@
-&ACCESS RVP
+&ACCESS RVO
 &REL 4
 &PARAM DISKPATH = KRC:\R1\Program
 DEF Connect3_Game ( )
@@ -6,7 +6,7 @@ DEF Connect3_Game ( )
 ;######### START USER DEFINED
 
 ;Structures
-STRUC CUBE INT player, INT pos_x, INT pos_y, INT round
+
 
 ;Variables
 DECL INT GAME_MODE, GRAVITY

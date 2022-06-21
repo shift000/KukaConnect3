@@ -1,0 +1,9 @@
+﻿&ACCESS RVP
+&PARAM EDITMASK = *
+DEFFCT BOOL C3_cleanup( )
+   ; for reihe 1to4
+   ; for spalte 1to6
+   ; check round und player
+   ; put back if wp != -1
+   RETURN TRUE
+ENDFCT

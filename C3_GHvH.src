@@ -8,7 +8,10 @@ DEF  C3_GHvH (GR:IN, WP:IN)
    DECL FRAME FG[4, 6]
    DECL FRAME FPL1[2, 6], FPL2[2, 6]
    
-   DECL BOOL playing
+   STRUC CUBE INT player, INT pos_x, INT pos_y, INT round
+   DECL CUBE FIELD[4, 6]   
+   
+   DECL BOOL playing, victory
    DECL INT gameround
    DECL INT row, col
    
@@ -73,14 +76,14 @@ DEF  C3_GHvH (GR:IN, WP:IN)
           START_POS_P2.X = Player2X - j*46.8868446
           START_POS_P2.Y = Player2Y + i*31.2624015
           
-          FPL1[j, i] = START_POS_P1
-          FPL2[j, i] = START_POS_P2
+          FPL1[j + 1, i + 1] = START_POS_P1
+          FPL2[j + 1, i + 1] = START_POS_P2
           
        ENDFOR
     ENDFOR
     
-    FX = 197.537445
-    FY = 1.61035585
+    FX = 199.0000
+    FY = 3.00000
     FZ = -0.367093951
     
     START_POS_FIELD = XP3
@@ -93,11 +96,21 @@ DEF  C3_GHvH (GR:IN, WP:IN)
           START_POS_FIELD.X = FX - j*31.410049
           START_POS_FIELD.Y = FY + i*46.55986355
           
-          FG[j, i] = START_POS_FIELD
+          FG[j +1, i + 1] = START_POS_FIELD
           
        ENDFOR
     ENDFOR
-   
+    
+    
+    ; ## FIELD ( Belegungsinformationen ) initial füllen
+    FOR j = 0 TO 3
+       FOR i = 0 TO 5
+          FIELD[j+1, i+1].player = -1
+          FIELD[j+1, i+1].pos_x = -1
+          FIELD[j+1, i+1].pos_y = -1
+          FIELD[j+1, i+1].round = -1
+       ENDFOR
+    ENDFOR
    
    ; ### GAMELOOP ###
    
@@ -106,6 +119,7 @@ DEF  C3_GHvH (GR:IN, WP:IN)
       ;-> hole Stein von Spieler WP
       ; Y POS
       row = 1
+      col = gameround
 
       ; X POS
       IF gameround > 12 THEN
@@ -113,26 +127,35 @@ DEF  C3_GHvH (GR:IN, WP:IN)
          col = gameround - 12   
       ENDIF
       
-      col = col / 2
-   
+      col = (col+1) / 2
+
       IF WP == 1 THEN   
          C3_getcube(FPL1[row, col])
       ELSE
          C3_getcube(FPL2[row, col])
       ENDIF
    
-   
       ;-> Auswahl auf Pad
       ; Test Gravity = off
-      sel_col = C3_IO(4)
-      sel_row = C3_IO(5)      
+      sel_row = C3_IO(5) 
+      sel_col = C3_IO(4)      
    
       ;-> Setze Stein
       C3_placecube(FG[sel_row, sel_col])
    
       ; Field[reihe, spalte] = Cube(whoPlays, reihe, spalte, gameround) - TODO
+      FIELD[sel_row, sel_col].player = WP
+      FIELD[sel_row, sel_col].pos_x = sel_row
+      FIELD[sel_row, sel_col].pos_y = sel_col
+      FIELD[sel_row, sel_col].round = gameround
    
-      ;C3_checkVictory()
+      ;Prüfe ob Spieler gewonnen hat
+      victory = C3_checkVictory(FIELD[,], WP)
+      if victory then
+         ; PLAYER X won
+         gameround = C3_IO(WP + 5)
+         playing = False
+      ENDIF
    
       ;-> Prüfe Gewinn (Ja -> Anzeige und loop beenden, nein -> weiter)
    
@@ -142,6 +165,9 @@ DEF  C3_GHvH (GR:IN, WP:IN)
       ELSE
          WP = 1
       ENDIF
+      
+      gameround = gameround + 1
+      
    ENDWHILE 
    ;-> Setze Steine zurück
    

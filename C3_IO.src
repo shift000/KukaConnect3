@@ -49,6 +49,16 @@
          
          askForSomething = {modul[] "ROW" , Nr 2004, msg_txt[] "Choose destinated row"}
       
+      CASE 6   ; Player 1 gewinnt
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "ok"}
+         
+         askForSomething = {modul[] "GAME FINISHED" , Nr 2004, msg_txt[] "PLAYER 1 WON !!!"}
+         
+      CASE 7   ; Player 2 gewinnt
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "ok"}
+         
+         askForSomething = {modul[] "GAME FINISHED" , Nr 2004, msg_txt[] "PLAYER 2 WON !!!"}
+      
       DEFAULT
          ; ERROR
    
