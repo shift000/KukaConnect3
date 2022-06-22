@@ -32,7 +32,7 @@ def player_by_round(lvl, rnd, p):
 
     if rnd > 11:
         if lvl == 1:
-            no_a, no_b = 0, 0
+            no_a, no_b = 6, 6
         else:
             if (rnd - 12) % 2 != 0:
                 no_a = int((rnd - 12 + 1) / 2)
@@ -70,6 +70,7 @@ def whoPlays(pl):
 
 
 def bot_anim(row, step, flag):
+    # print(row, step, flag)
     flag = " " if flag == 0 else "X" if flag == 1 else "O"
     bot_4 = ["+" + " " * 7 + " ||   " + " " * 9 + "+",
              "+" + " " * 7 + " //   " + " " * 9 + "+",
@@ -106,12 +107,27 @@ def play_anim(r, p, row, mode, d):
     if d == 0:
         for e in range(4):
             render_view(r, p, row, mode, e)
-            time.sleep(.2)
+            time.sleep(.1)
     else:
         for e in range(3, -1, -1):
             render_view(r, p, row, mode, e)
-            time.sleep(.2)
-    time.sleep(.3)
+            time.sleep(.1)
+    time.sleep(.2)
+
+
+def anim_start():
+    # Animation Start und Einstellung
+    time.sleep(.0)
+
+
+def anim_win(no):
+    # Animation Ende und <ok> to start again
+    pass
+
+
+def anim_loading():
+    # Loading Screen
+    pass
 
 
 def render_view(r, p, row, mode=0, s=0):
