@@ -35,106 +35,222 @@ class KI:
     def get_moves(self):
         return
 
-    def poss_moves(self, Y, X):
-        xmin = 0
-        xmax = 5
-        ymin = 0
-        ymax = 3
+    def check_center(self, arr):
+        r = -1
+        if len(arr) > 1:
+            for e in arr[1:]:
+                r = self.move_center(arr[0], e)
+                if r != -1:
+                    break
 
-        # check center r = 1
-        if xmin < X < xmax:
-            if arr_field[Y][X - 1].is_empty() and arr_field[Y][X + 1].is_empty():
-                if Y == ymax or not arr_field[Y + 1][X - 1].is_empty() and not arr_field[Y + 1][X + 1].is_empty():
-                    self.moves.append(Move("1", [Y, X], [Y, X - 1], [Y, X + 1]))
+            if r == -1:
+                r = self.check_center(arr[1:])
+        return r
 
-        # check left r = 2
-        if X > xmin + 1:
-            if arr_field[Y][X - 2].is_empty() and arr_field[Y][X - 1].is_empty():
-                if Y == ymax or not arr_field[Y + 1][X - 2].is_empty() and not arr_field[Y + 1][X - 1].is_empty():
-                    self.moves.append(Move("2", [Y, X], [Y, X - 1], [Y, X - 2]))
+    def check_next(self, arr):
+        r = -1
+        if len(arr) > 1:
+            for e in arr[1:]:
+                r = self.move_next(arr[0], e)
+                if r != -1:
+                    break
 
-        # check right r = 2
-        if X < xmax - 1:
-            if arr_field[Y][X + 1].is_empty() and arr_field[Y][X + 2].is_empty():
-                if Y == ymax or not arr_field[Y + 1][X + 2].is_empty() and not arr_field[Y + 1][X + 1].is_empty():
-                    self.moves.append(Move("2", [Y, X], [Y, X + 1], [Y, X + 2]))
+            if r == -1:
+                r = self.check_next(arr[1:])
+        return r
 
-        # check top r = 2
-        if Y > ymax - 2:
-            if arr_field[Y - 1][X].is_empty() and arr_field[Y - 2][X].is_empty():
-                self.moves.append(Move("2", [Y, X], [Y - 1, X], [Y - 2, X]))
+    def move_center(self, in_a, in_b):
+        # print(self.sign, in_a, " -> ", in_b)
+        x1 = (in_a[0] - in_b[0]) / 2
+        x2 = (in_a[1] - in_b[1]) / 2
 
-        # check left strike r = 3
-        if X > xmin + 1 and Y > ymin + 1:
-            if arr_field[Y - 1][X - 1].is_empty() and arr_field[Y - 2][X - 2].is_empty():
-                if not arr_field[Y][X - 1].is_empty() and not arr_field[Y - 1][X - 2].is_empty():
-                    self.moves.append(Move("3", [Y, X], [Y - 1, X - 1], [Y - 2, X - 2]))
+        ret = -1
 
-        # check right strike	r = 3
-        if X < xmax - 1 and Y > ymin + 1:
-            if arr_field[Y - 1][X + 1].is_empty() and arr_field[Y - 2][X + 2].is_empty():
-                if not arr_field[Y][X + 1].is_empty() and not arr_field[Y - 1][X + 2].is_empty():
-                    self.moves.append(Move("3", [Y, X], [Y - 1, X + 1], [Y - 2, X + 2]))
+        if [x1, x2] in [[1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1]]:  # X _ X
+            spalte, reihe = int(in_a[0] + (x1 * -1)), int(in_a[1] + (x2 * -1))
 
-        # check left strike cube in center r = 3
-        if X > xmin and Y < ymax - 1:
-            if arr_field[Y - 1][X - 1].is_empty() and arr_field[Y + 1][X + 1].is_empty():
-                if not arr_field[Y][X - 1].is_empty():
-                    self.moves.append(Move("3", [Y, X], [Y - 1, X - 1], [Y + 1, X + 1]))
+            if arr_field[reihe][spalte].is_empty():
+                if reihe == 3 or arr_field[reihe + 1][spalte].player_id in ["X", "O"]:
+                    ret = [spalte + 1, reihe + 1]
+            else:
+                ret = -1
 
-        # check right strike in center	r = 3
-        if X < xmax and Y < ymax - 1:
-            if arr_field[Y - 1][X + 1].is_empty() and arr_field[Y + 1][X - 1].is_empty():
-                if not arr_field[Y][X + 1].is_empty():
-                    self.moves.append(Move("3", [Y, X], [Y - 1, X + 1], [Y + 1, X - 1]))
+        # print(self.sign, x1, x2, [x1, x2] in [[-1, 1], [1, 1], [-1, 0]], " => ", ret)
+
+        return ret
+
+    def move_next(self, in_a, in_b):
+        mi, ma = min(in_a, in_b), max(in_a, in_b)
+
+        x1 = (mi[0] - ma[0]) / 2
+        x2 = (mi[1] - ma[1]) / 2
+
+        a_x = mi[0]
+        a_y = mi[1]
+
+        b_x = ma[0]
+        b_y = ma[1]
+
+        ret = -1
+
+        # INFO : arr_field [ Y ][ X ]
+
+        if [x1, x2] in [[-0.5, 0], [0.5, 0]]:
+            if logging:
+                print("SIDE ", mi, ma)
+
+            if 0 < a_x < 5 and 0 < a_y <= 3:
+                if arr_field[a_y][a_x - 1].is_empty() and (
+                        a_y == 3 or not arr_field[a_y + 1][a_x - 1].is_empty()):  # _XX
+                    if logging:
+                        print("LEFT ", a_x - 1, a_y)
+
+                    return [a_x, a_y]
+            elif 0 < b_x < 5 and 0 < b_y <= 3:
+                if arr_field[b_y][b_x + 1].is_empty() and (
+                        b_y == 3 or not arr_field[b_y + 1][b_x + 1].is_empty()):  # XX_
+                    if logging:
+                        print("RIGHT ", b_x + 1, b_y)
+
+                    return [b_x + 1, b_y]
+
+        elif [x1, x2] in [[0, -0.5], [0, 0.5]]:  # top
+            if logging:
+                print("TOP ", mi, ma)
+
+            if a_y > 0 and arr_field[a_y - 1][a_x].is_empty():
+                return [a_x + 1, a_y - 1]
+
+        elif [x1, x2] in [[0.5, -0.5], [-0.5, 0.5]]:  # left side
+            if logging:
+                print("Right SIDE  - CHECK ", mi, " and ", ma)
+
+            if b_x < 5 and b_y > 0:
+                if logging:
+                    print("TOP - NEXT ", [b_x + 1, b_y - 1], " DOWN ", [b_x + 1, b_y])
+
+                if arr_field[b_y - 1][b_x + 1].is_empty() and not arr_field[b_y][b_x + 1].is_empty():
+                    return [b_y - 1, b_x + 1]
+            elif b_x < 5 and b_y < 2:
+                if logging:
+                    print("BOTT - NEXT ", [b_x, b_y], " DOWN ", [b_x - 1, b_y + 1])
+
+                if arr_field[b_y + 1][b_x + 1].is_empty() and not arr_field[b_x + 1][b_x + 2].is_empty():
+                    return [b_x + 1, b_y + 1]
+
+        elif [x1, x2] in [[-0.5, -0.5], [0.5, 0.5]]:  # right side
+            if logging:
+                print("Left SIDE  - CHECK ", mi, " and ", ma)
+
+            if a_x > 0 and a_y > 0:
+                if logging:
+                    print("TOP - NEXT ", [a_x - 1, a_y - 1], " DOWN ", [a_x - 1, a_y])
+
+                if arr_field[a_y - 1][a_x - 1].is_empty():
+                    if a_y == 3 or not arr_field[a_y][a_x - 1].is_empty():
+                        return [a_x - 1, a_y - 1]
+            elif b_x < 5 and b_y > 0:
+                if logging:
+                    print("BOTT - NEXT ", [b_x, b_y], " DOWN ", [b_x - 1, b_y + 1])
+
+                if arr_field[a_y + 1][a_x - 1].is_empty() and not arr_field[a_y + 1][a_x].is_empty():
+                    return [a_x + 1, a_y - 1]
+
+        if logging:
+            print(self.sign, x1, x2, [x1, x2] in [[-1, 1], [1, 1], [-1, 0]], " => ", ret)
+
+        return [ret[0] + 1, ret[1] + 1] if ret != -1 else -1
+
+    def move_random(self):
+        rng = []
+        for a_y in arr_field:
+            no = 0
+            for a_x in a_y:
+                if a_x.is_empty():
+                    if no not in rng:
+                        rng.append(no)
+                no += 1
+        if rng:
+            return rng[random.randint(0, len(rng) - 1)]
+        else:
+            # FIELD FULL - You made it till there?
+            return -1
 
     def make_move(self):
-        for e in moves:
-            move = e.m
+        if logging:
+            print("[%s] MAKING MOVE" % self.sign)
 
-            # teste ob move möglich
-            next_1 = move[1]
-            next_2 = move[2]
+        placed_enemy = []
+        placed_me = []
+        pointer = [0, 0]
 
-            if arr_field[next_1[0]][next_1[1]].is_empty() and arr_field[next_2[0]][next_2[1]].is_empty():
-                if arr_field[next_1[0]][next_1[1]].is_player(self.sign):
-                    # platziere letzten
-                    return [self.sign, next_2[1]]
+        for e in arr_field:
+            ln = ""
+            pointer[0] = 0
+            for t in e:
+                if t.player_id != -1:
+                    if t.player_id != self.sign:
+                        ln += "!"
+                        placed_enemy.append([pointer[0], pointer[1]])
+                    else:
+                        ln += "$"
+                        placed_me.append([pointer[0], pointer[1]])
                 else:
-                    # platziere zweiten
-                    return [self.sign, next_1[1]]
+                    ln += "."
+                pointer[0] += 1
+            pointer[1] += 1
+            # print(ln)
 
-            else:  # move nicht mehr möglich, entferne
-                # print("ENTFERNE %s" % e.m)
-                moves.remove(e)
+        time.sleep(.1)
 
-        # print("[A] random")
+        return_move = -1
 
-        self.poss_moves(0, 0)
-        self.moves = self.shuffle()
+        # TODO : CHECK IF I COULD WIN - PRIO 1
+        if return_move == -1:
+            if logging:
+                print("CHECK FOR ME")
+            if len(placed_me) > 1:
+                return_move = self.check_center(placed_me)
+                if return_move == -1:
+                    return_move = self.check_next(placed_me)
+            if return_move != -1:
+                time.sleep(.2)
+                return [self.sign, return_move[0]]
 
-        return [self.sign, random.randint(0, 5)]
+        # TODO : CHECK IF ENEMY COULD WIN - PRIO 2
+        if return_move == -1:
+            if logging:
+                print("CHECK FOR ENEMY")
+            if len(placed_enemy) > 1:  # in center X _ X
+                return_move = self.check_center(placed_enemy)
+                if return_move == -1:  # next X X _
+                    return_move = self.check_next(placed_enemy)
+            if return_move != -1:
+                time.sleep(.2)
+                return [self.sign, return_move[0]]
 
-    def shuffle(self):
-        # sort ratings from 1 to 3
-        temp = []
+        # TODO : PLACE RANDOM - PRIO 3
+        if return_move == -1:
+            if logging:
+                print("RANDOM")
+            return_move = self.move_random()
 
-        for e in range(3):
-            for m in self.moves:
-                if m.r == str(e + 1):
-                    temp.append(m)
+        time.sleep(1)
 
-        # print(temp, moves)
-
-        return temp
-
+        return [self.sign, return_move]
 
 class Player:
     def __init__(self, sign):
         self.sign = sign
 
     def make_move(self):
-        return [self.sign, int(input(answer))]
+        inp = -1
+        while inp not in [1, 2, 3, 4, 5, 6]:
+            try:
+                inp = int(input(cursor))
+            except ValueError:
+                pass
+        return [self.sign, inp]
 
 
 # Array Spielfeld
@@ -150,11 +266,9 @@ moves = []
 playing = True
 gameround = 0
 time2wait = 1
+logging = False
 
 list_player = []
-
-grav_mode = 0  # Gravity on
-game_mode = 0  # HvH
 
 
 class Move:
@@ -170,6 +284,15 @@ def place_cube(sign, number, letter=0):  # eg. place_cube("A", 4)
             # print("found at %d %d" % (e,number))
             arr_field[e][number - 1] = Cube(sign)
             return [e, number - 1]
+    return -1
+
+
+def log(inp):
+    if logging:
+        s = ""
+        for e in inp:
+            s += str(e)
+        print(e)
 
 
 def listify_field(arr):
@@ -223,40 +346,41 @@ def check_win(sign):
     return False
 
 
-anim_start()
-# Ask for Gamemode
-game_mode = int(input("HvH [1] or HvR [2] or RvR [3]")) - 1
+game_mode, grav_mode, curr_player = anim_start()
+
+
 list_player = [Player("X"), Player("O")] if game_mode == 0 else [Player("X"), KI("O")] if game_mode == 1 else [KI("X"),
                                                                                                                KI("O")]
-
-# Ask for Gravity Mode
-grav_mode = int(input("On [1] or Off [0]")) - 1
-grav_mode = 0
-
-# Ask for Starting Player
-curr_player = int(input(" 1 or 2")) - 1
 
 anim_loading()
 
 while playing:
     for step in range(2):
-        print("Player-> ", curr_player)
+        if playing:
+            anim_get_cube(step+1)
 
-        anim_get_cube(step + 1)
+            x = list_player[curr_player].make_move()
 
-        x = list_player[curr_player].make_move()
-        print(x)
-        place_cube(x[0], x[1])
+            a = place_cube(x[0], x[1])
+            while a == -1:
+                print(quest_by_mode(0))
+                x = list_player[curr_player].make_move()
+                a = place_cube(x[0], x[1])
 
-        anim_place_cube()
 
-        if check_win(list_player[curr_player].sign):
+            anim_place_cube()
+
+            if check_win(list_player[curr_player].sign):
+
+                anim_win(step + 1)
+                playing = False
+                continue
+            else:
+                curr_player = 1 if curr_player == 0 else 0
+                gameround += 1
+
+                time.sleep(.2)
+        else:
+
             anim_win(step + 1)
-            playing = False
-            continue
-
-        curr_player = 1 if curr_player == 0 else 0
-        gameround += 1
-
-        time.sleep(.2)
 exit()
