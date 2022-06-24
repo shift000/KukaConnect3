@@ -95,6 +95,7 @@ class KI:
 
         # INFO : arr_field [ Y ][ X ]
 
+        # SIDE
         if [x1, x2] in [[-0.5, 0], [0.5, 0]]:
             if logging:
                 print("SIDE ", mi, ma)
@@ -103,58 +104,62 @@ class KI:
                 if arr_field[a_y][a_x - 1].is_empty() and (
                         a_y == 3 or not arr_field[a_y + 1][a_x - 1].is_empty()):  # _XX
                     if logging:
-                        print("LEFT ", a_x - 1, a_y)
+                        print("LEFT ", a_x - 1, a_y + 1)
 
                     return [a_x, a_y]
-            elif 0 < b_x < 5 and 0 < b_y <= 3:
+            if 0 < b_x < 5 and 0 < b_y <= 3:
                 if arr_field[b_y][b_x + 1].is_empty() and (
                         b_y == 3 or not arr_field[b_y + 1][b_x + 1].is_empty()):  # XX_
                     if logging:
-                        print("RIGHT ", b_x + 1, b_y)
+                        print("RIGHT ", b_x + 2, b_y)
 
-                    return [b_x + 1, b_y]
+                    return [b_x + 2, b_y]
 
-        elif [x1, x2] in [[0, -0.5], [0, 0.5]]:  # top
+        # TOP
+        if [x1, x2] in [[0, -0.5], [0, 0.5]]:  # top
             if logging:
                 print("TOP ", mi, ma)
 
             if a_y > 0 and arr_field[a_y - 1][a_x].is_empty():
                 return [a_x + 1, a_y - 1]
 
-        elif [x1, x2] in [[0.5, -0.5], [-0.5, 0.5]]:  # left side
+        # SCHRAEG RECHTS
+        if [x1, x2] in [[0.5, -0.5], [-0.5, 0.5]]:  # left side
             if logging:
                 print("Right SIDE  - CHECK ", mi, " and ", ma)
 
             if b_x < 5 and b_y > 0:
                 if logging:
-                    print("TOP - NEXT ", [b_x + 1, b_y - 1], " DOWN ", [b_x + 1, b_y])
+                    print("TOP - NEXT ", [b_x + 2, b_y - 1], " DOWN ", [b_x + 1, b_y])
 
                 if arr_field[b_y - 1][b_x + 1].is_empty() and not arr_field[b_y][b_x + 1].is_empty():
-                    return [b_y - 1, b_x + 1]
+                    # return [b_y - 1, b_x + 1]
+                    return [b_x + 2, b_y - 1]
             elif b_x < 5 and b_y < 2:
                 if logging:
-                    print("BOTT - NEXT ", [b_x, b_y], " DOWN ", [b_x - 1, b_y + 1])
+                    print("BOTT - NEXT ", [b_x + 1, b_y + 1], " DOWN ", [b_x + 1, b_y + 2])
 
-                if arr_field[b_y + 1][b_x + 1].is_empty() and not arr_field[b_x + 1][b_x + 2].is_empty():
+                if arr_field[b_y + 1][b_x + 1].is_empty() and not arr_field[b_y + 2][b_x + 1].is_empty():
                     return [b_x + 1, b_y + 1]
 
-        elif [x1, x2] in [[-0.5, -0.5], [0.5, 0.5]]:  # right side
+        # SCHRAEG LINKS
+        if [x1, x2] in [[-0.5, -0.5], [0.5, 0.5]]:  # right side
             if logging:
                 print("Left SIDE  - CHECK ", mi, " and ", ma)
 
-            if a_x > 0 and a_y > 0:
+            if a_x > 0 and 0 < a_y < 3:
                 if logging:
                     print("TOP - NEXT ", [a_x - 1, a_y - 1], " DOWN ", [a_x - 1, a_y])
 
                 if arr_field[a_y - 1][a_x - 1].is_empty():
                     if a_y == 3 or not arr_field[a_y][a_x - 1].is_empty():
-                        return [a_x - 1, a_y - 1]
-            elif b_x < 5 and b_y > 0:
+                        return [a_x, a_y - 1]
+            elif b_x < 5 and 0 < b_y < 3:
                 if logging:
-                    print("BOTT - NEXT ", [b_x, b_y], " DOWN ", [b_x - 1, b_y + 1])
+                    print("BOTT - NEXT ", [b_x + 1, b_y + 1], " DOWN ", [b_x + 1, b_y + 2])
 
-                if arr_field[a_y + 1][a_x - 1].is_empty() and not arr_field[a_y + 1][a_x].is_empty():
-                    return [a_x + 1, a_y - 1]
+                if arr_field[b_y + 1][b_x + 1].is_empty() and not arr_field[b_y + 2][b_x + 1].is_empty():
+                    return [b_x + 2, b_y + 2]
 
         if logging:
             print(self.sign, x1, x2, [x1, x2] in [[-1, 1], [1, 1], [-1, 0]], " => ", ret)
@@ -201,7 +206,7 @@ class KI:
             pointer[1] += 1
             # print(ln)
 
-        time.sleep(.1)
+        time.sleep(.2)
 
         return_move = -1
 
@@ -214,7 +219,9 @@ class KI:
                 if return_move == -1:
                     return_move = self.check_next(placed_me)
             if return_move != -1:
-                time.sleep(.2)
+
+                if logging:
+                    print("[%s] => PLACING %s" % (self.sign, return_move))
                 return [self.sign, return_move[0]]
 
         # TODO : CHECK IF ENEMY COULD WIN - PRIO 2
@@ -226,7 +233,9 @@ class KI:
                 if return_move == -1:  # next X X _
                     return_move = self.check_next(placed_enemy)
             if return_move != -1:
-                time.sleep(.2)
+
+                if logging:
+                    print("[%s] => PLACING %s" % (self.sign, return_move))
                 return [self.sign, return_move[0]]
 
         # TODO : PLACE RANDOM - PRIO 3
@@ -235,9 +244,13 @@ class KI:
                 print("RANDOM")
             return_move = self.move_random()
 
-        time.sleep(1)
+        time.sleep(.2)
+
+        if logging:
+            print("[%s] => PLACING %s" % (self.sign, return_move))
 
         return [self.sign, return_move]
+
 
 class Player:
     def __init__(self, sign):
@@ -266,9 +279,20 @@ moves = []
 playing = True
 gameround = 0
 time2wait = 1
-logging = False
+logging = True
 
 list_player = []
+
+log = []
+
+
+def write_log():
+    lf = "log.file"
+    lh = open(lf, "w+")
+    lh.seek(0)
+    for e in log:
+        lh.write(e)
+    lh.close()
 
 
 class Move:
@@ -287,14 +311,6 @@ def place_cube(sign, number, letter=0):  # eg. place_cube("A", 4)
     return -1
 
 
-def log(inp):
-    if logging:
-        s = ""
-        for e in inp:
-            s += str(e)
-        print(e)
-
-
 def listify_field(arr):
     ret = []
     for r in arr:
@@ -306,12 +322,12 @@ def listify_field(arr):
     return ret
 
 
-def anim_get_cube(p):
-    play_anim(gameround, p, listify_field(arr_field), grav_mode, 0)
+def anim_get_cube(p, tp):
+    play_anim(gameround, p, listify_field(arr_field), tp, 0)
 
 
-def anim_place_cube():
-    play_anim(gameround, 0, listify_field(arr_field), grav_mode, 1)
+def anim_place_cube(tp):
+    play_anim(gameround, 0, listify_field(arr_field), tp, 1)
 
 
 def check_win(sign):
@@ -348,33 +364,43 @@ def check_win(sign):
 
 game_mode, grav_mode, curr_player = anim_start()
 
-
 list_player = [Player("X"), Player("O")] if game_mode == 0 else [Player("X"), KI("O")] if game_mode == 1 else [KI("X"),
                                                                                                                KI("O")]
-
 anim_loading()
 
 while playing:
     for step in range(2):
         if playing:
-            anim_get_cube(step+1)
+            pla = list_player[curr_player]
+
+            anim_get_cube(step + 1, 1 if type(pla) == KI else 0)
 
             x = list_player[curr_player].make_move()
 
             a = place_cube(x[0], x[1])
+            loop_breaker = 2
             while a == -1:
-                print(quest_by_mode(0))
+                print(quest_by_mode(2))
                 x = list_player[curr_player].make_move()
                 a = place_cube(x[0], x[1])
 
-
-            anim_place_cube()
+                if loop_breaker <= 0:
+                    if logging:
+                        print("loop detected")
+                    time.sleep(5)
+                else:
+                    loop_breaker -= 1
+#
+            anim_place_cube(1 if type(pla) == KI else 0)
 
             if check_win(list_player[curr_player].sign):
-
+                anim_cleanup()
                 anim_win(step + 1)
                 playing = False
-                continue
+
+                # Exit Program, return cmd color
+                os.system("color 0f")
+                exit()
             else:
                 curr_player = 1 if curr_player == 0 else 0
                 gameround += 1

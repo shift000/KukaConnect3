@@ -101,9 +101,11 @@ def bot_anim(row, step, flag):
 
 def quest_by_mode(mode):
     if mode == 0:
-        question = "+> SELECT COLUMN(1-6)"
+        question = "+> SELECT COLUMN(1-6)" + " "*2
+    elif mode == 1:
+        question = "+> playing..\t" + " "*7
     else:
-        question = "+> SELECT ROW(A-D)"
+        question = "+> Watch your input!(1-6)"
     return question
 
 
@@ -150,11 +152,15 @@ def anim_start():
 
         welcome[5] = "+" + " " * a + "<PrESS StART>" + " " * b + "+"
 
-        time.sleep(.08)
+        time.sleep(.05)
 
     input(cursor + "<enter to start > ")
 
     return anim_selection()
+
+
+def anim_cleanup():
+    pass
 
 
 def anim_win(no):
@@ -180,8 +186,6 @@ def anim_win(no):
     input("\n> Press <enter> to exit..")
 
     # RESET CONSOLE COLOR
-    os.system("color 0f")
-    exit()
 
 
 def anim_loading():
