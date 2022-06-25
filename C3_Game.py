@@ -1,5 +1,6 @@
 import random
 import time
+import sys
 
 from C3_graphic import *
 
@@ -137,10 +138,10 @@ class KI:
                     return [b_x + 2, b_y - 1]
             elif b_x < 5 and b_y < 2:
                 if logging:
-                    print("BOTT - NEXT ", [b_x + 1, b_y + 1], " DOWN ", [b_x + 1, b_y + 2])
+                    print("BOTT - NEXT ", [a_x - 1, a_y + 1], " DOWN ", [a_x - 1, a_y + 2])
 
-                if arr_field[b_y + 1][b_x + 1].is_empty() and not arr_field[b_y + 2][b_x + 1].is_empty():
-                    return [b_x + 1, b_y + 1]
+                if arr_field[a_y + 1][a_x - 1].is_empty() and not arr_field[a_y + 2][a_x - 1].is_empty():
+                    return [a_x, a_y + 1]
 
         # SCHRAEG LINKS
         if [x1, x2] in [[-0.5, -0.5], [0.5, 0.5]]:  # right side
@@ -158,8 +159,9 @@ class KI:
                 if logging:
                     print("BOTT - NEXT ", [b_x + 1, b_y + 1], " DOWN ", [b_x + 1, b_y + 2])
 
-                if arr_field[b_y + 1][b_x + 1].is_empty() and not arr_field[b_y + 2][b_x + 1].is_empty():
-                    return [b_x + 2, b_y + 2]
+                if arr_field[b_y + 1][b_x + 1].is_empty():
+                    if b_y + 1 == 3 or not arr_field[b_y + 2][b_x + 1].is_empty():
+                        return [b_x + 2, b_y + 2]
 
         if logging:
             print(self.sign, x1, x2, [x1, x2] in [[-1, 1], [1, 1], [-1, 0]], " => ", ret)
@@ -169,13 +171,15 @@ class KI:
     def move_random(self):
         rng = []
         for a_y in arr_field:
-            no = 0
+            no = 1
             for a_x in a_y:
                 if a_x.is_empty():
                     if no not in rng:
                         rng.append(no)
                 no += 1
         if rng:
+            print("RAND => ", rng)
+            time.sleep(.8)
             return rng[random.randint(0, len(rng) - 1)]
         else:
             # FIELD FULL - You made it till there?
@@ -362,11 +366,29 @@ def check_win(sign):
     return False
 
 
-game_mode, grav_mode, curr_player = anim_start()
+if len(sys.argv) > 1:
+    gm = int(sys.argv[1])
+
+    if gm in [1, 2, 3]:
+        game_mode, grav_mode, curr_player = gm-1, 0, 0
+    else:
+        print("Usage :")
+        print("python C3_Game.py <gm>")
+        print("for <gm>")
+        print("1 Human vs. Human")
+        print("2 Human vs. Robot")
+        print("3 Robot vs. Robot")
+
+        os.system("color 0f")
+        exit()
+else:
+    game_mode, grav_mode, curr_player = anim_start()
 
 list_player = [Player("X"), Player("O")] if game_mode == 0 else [Player("X"), KI("O")] if game_mode == 1 else [KI("X"),
                                                                                                                KI("O")]
 anim_loading()
+
+time_started = time.time()
 
 while playing:
     for step in range(2):
@@ -395,6 +417,9 @@ while playing:
 
             if check_win(list_player[curr_player].sign):
                 anim_cleanup()
+
+                print("+\n+ [i] Finished in [ %s ] sec" % round(time.time() - time_started, 2))
+
                 anim_win(step + 1)
                 playing = False
 

@@ -113,11 +113,11 @@ def play_anim(r, p, row, mode, d):
     if d == 0:
         for e in range(4):
             render_view(r, p, row, mode, e)
-            time.sleep(.1)
+            time.sleep(.08)
     else:
         for e in range(3, -1, -1):
             render_view(r, p, row, mode, e)
-            time.sleep(.1)
+            time.sleep(.08)
     time.sleep(.2)
 
 
@@ -152,7 +152,7 @@ def anim_start():
 
         welcome[5] = "+" + " " * a + "<PrESS StART>" + " " * b + "+"
 
-        time.sleep(.05)
+        time.sleep(.0)
 
     input(cursor + "<enter to start > ")
 
@@ -271,7 +271,7 @@ def render_view(r, p, row, mode=0, s=0):
                   spacer[:-1] + spacer[c:-c] + spacer[1:],
                   quest_by_mode(mode) + spacer[c:-c] + spacer[1:]]:
         print(level)
-    time.sleep(.1)
+    # time.sleep(.1)
 
 
 
