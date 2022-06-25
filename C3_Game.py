@@ -178,7 +178,8 @@ class KI:
                         rng.append(no)
                 no += 1
         if rng:
-            print("RAND => ", rng)
+            if logging:
+                print("RAND => ", rng)
             time.sleep(.8)
             return rng[random.randint(0, len(rng) - 1)]
         else:
@@ -283,7 +284,7 @@ moves = []
 playing = True
 gameround = 0
 time2wait = 1
-logging = True
+logging = False
 
 list_player = []
 
@@ -381,6 +382,10 @@ if len(sys.argv) > 1:
 
         os.system("color 0f")
         exit()
+
+    if len(sys.argv) > 2:
+        if sys.argv[2] == "1":
+            logging = True
 else:
     game_mode, grav_mode, curr_player = anim_start()
 
@@ -418,7 +423,8 @@ while playing:
             if check_win(list_player[curr_player].sign):
                 anim_cleanup()
 
-                print("+\n+ [i] Finished in [ %s ] sec" % round(time.time() - time_started, 2))
+                if logging:
+                    print("+\n+ [i] Finished in [ %s ] sec" % round(time.time() - time_started, 2))
 
                 anim_win(step + 1)
                 playing = False
@@ -430,8 +436,13 @@ while playing:
                 curr_player = 1 if curr_player == 0 else 0
                 gameround += 1
 
-                time.sleep(.2)
+                if logging:
+                    time.sleep(2)
+                else:
+                    time.sleep(.2)
         else:
 
             anim_win(step + 1)
+
+
 exit()

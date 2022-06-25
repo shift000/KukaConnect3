@@ -152,7 +152,7 @@ def anim_start():
 
         welcome[5] = "+" + " " * a + "<PrESS StART>" + " " * b + "+"
 
-        time.sleep(.0)
+        time.sleep(.06)
 
     input(cursor + "<enter to start > ")
 
