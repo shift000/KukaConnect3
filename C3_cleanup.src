@@ -1,9 +1,47 @@
-﻿&ACCESS RVP
-&PARAM EDITMASK = *
-DEFFCT BOOL C3_cleanup( )
+&ACCESS RVO
+&REL 4
+&PARAM DISKPATH = KRC:\R1\Program
+DEF C3_cleanup(FIELD[,]:OUT, FPL1[,]:OUT, FPL2[,]:OUT, FG[,]:OUT)
+   STRUC CUBE INT player, INT pos_x, INT pos_y, INT round
+   DECL CUBE FIELD[,]
+   DECL FRAME FPL1[, ], FPL2[, ] 
+   DECL FRAME FG[, ]
+   DECL INT reihe, spalte, row, col
+   
+   
+   
+    
+    FOR spalte = 1 TO 6
+      FOR reihe = 1 TO 4
+         if FIELD[reihe, spalte].player <> -1 THEN
+            C3_getcube(FG[reihe, spalte])
+            
+            row = 1
+            col = FIELD[reihe, spalte].round
+
+            ; X POS
+            IF FIELD[reihe, spalte].round > 12 THEN
+               row = 2      
+               col = FIELD[reihe, spalte].round - 12   
+            ENDIF
+      
+            col = (col+1) / 2
+
+            IF FIELD[reihe, spalte].player == 1 THEN   
+               C3_placecube(FPL1[row, col])
+            ELSE
+               C3_placecube(FPL2[row, col])
+            ENDIF
+            
+         endif
+
+         
+         
+      ENDFOR
+   ENDFOR
+   
    ; for reihe 1to4
    ; for spalte 1to6
    ; check round und player
    ; put back if wp != -1
-   RETURN TRUE
-ENDFCT
+END

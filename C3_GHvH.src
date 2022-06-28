@@ -1,4 +1,4 @@
-&ACCESS RV1
+2&ACCESS RV1
 DEF  C3_GHvH (GR:IN, WP:IN)
    ; GR [GRAVITY], WP [WHO PLAYS], FG [FIELD GAME]
    ; FP1 [FIELD PLAYER 1], FP2 [FIELD PLAYER 2] 
@@ -12,7 +12,7 @@ DEF  C3_GHvH (GR:IN, WP:IN)
    DECL CUBE FIELD[4, 6]   
    
    DECL BOOL playing, victory
-   DECL INT gameround
+   DECL INT gameround, temp
    DECL INT row, col
    
    DECL INT sel_row, sel_col
@@ -114,7 +114,7 @@ DEF  C3_GHvH (GR:IN, WP:IN)
    
    ; ### GAMELOOP ###
    
-   WHILE playing and (gameround <= 24)
+   WHILE playing and (gameround <= 24) and ($IN[1] == False)
       
       ;-> hole Stein von Spieler WP
       ; Y POS
@@ -129,16 +129,39 @@ DEF  C3_GHvH (GR:IN, WP:IN)
       
       col = (col+1) / 2
 
-      IF WP == 1 THEN   
+      IF WP == 1 THEN
+         $OUT[1] = TRUE            
          C3_getcube(FPL1[row, col])
       ELSE
+         $OUT[2] = TRUE
          C3_getcube(FPL2[row, col])
       ENDIF
    
       ;-> Auswahl auf Pad
       ; Test Gravity = off
-      sel_row = C3_IO(5) 
-      sel_col = C3_IO(4)      
+      sel_row = 0
+      while sel_row == 0 
+         
+         sel_col = C3_IO(4)
+         if GR == 1 then
+            FOR j = 1 TO 4 STEP 1
+               IF FIELD[j, sel_col].player == -1 THEN
+                  sel_row = j
+               ENDIF
+            ENDFOR  
+         if sel_row == 0 then
+             temp = C3_IO(8)
+         endif         
+         ELSE
+            sel_row = C3_IO(5)
+            IF FIELD[sel_row, sel_col].player <> -1 THEN
+               temp = C3_IO(8)
+               sel_row = 0
+            ENDIF
+         ENDIF 
+         
+      ENDWHILE         
+            
    
       ;-> Setze Stein
       C3_placecube(FG[sel_row, sel_col])
@@ -161,15 +184,21 @@ DEF  C3_GHvH (GR:IN, WP:IN)
    
       ; Player wechseln
       IF WP == 1 THEN
+         $OUT[1] = FALSE
+         $OUT[2] = TRUE 
          WP = 2
       ELSE
+         $OUT[2] = FALSE
+         $OUT[1] = TRUE 
          WP = 1
       ENDIF
       
       gameround = gameround + 1
       
    ENDWHILE 
+   
    ;-> Setze Steine zurück
+   C3_cleanup(FIELD[,], FPL1[,], FPL2[,], FG[,])
    
    ;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT
       $BWDSTART = FALSE

@@ -10,7 +10,6 @@ DEFFCT BOOL C3_checkVictory(FIELD[,]:OUT, Player:IN)
    
    
    ; CHECK VERT
-   HALT
    FOR spalte = 1 TO 6
       FOR reihe = 1 TO 2
          
@@ -23,7 +22,6 @@ DEFFCT BOOL C3_checkVictory(FIELD[,]:OUT, Player:IN)
          endif
       ENDFOR
    ENDFOR
-   HALT
    
    ; CHECK HORI
    FOR reihe = 1 TO 4
@@ -38,7 +36,6 @@ DEFFCT BOOL C3_checkVictory(FIELD[,]:OUT, Player:IN)
          ENDIF
       ENDFOR
    ENDFOR
-   HALT
    
    ; CHECK DIAG RIGHT
    FOR spalte = 1 TO 4
@@ -54,7 +51,6 @@ DEFFCT BOOL C3_checkVictory(FIELD[,]:OUT, Player:IN)
 
       ENDFOR
    ENDFOR
-   HALT
    
    ; CHECK DIAG LEFT
    FOR spalte = 3 TO 6
@@ -69,7 +65,6 @@ DEFFCT BOOL C3_checkVictory(FIELD[,]:OUT, Player:IN)
          ENDIF
       ENDFOR
    ENDFOR
-   HALT
    
    RETURN STATUS
 ENDFCT

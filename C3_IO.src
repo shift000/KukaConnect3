@@ -59,6 +59,10 @@
          
          askForSomething = {modul[] "GAME FINISHED" , Nr 2004, msg_txt[] "PLAYER 2 WON !!!"}
       
+      CASE 8   ; Player 2 gewinnt
+         somethingSoftkey[1] = {sk_type #value, sk_txt[] "ok"}
+         
+         askForSomething = {modul[] "ERROR" , Nr 2004, msg_txt[] "This field is occupied. Select another one! "}
       DEFAULT
          ; ERROR
    
